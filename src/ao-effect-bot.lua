@@ -1,9 +1,6 @@
 -- Initializing global variables to store the latest game state and game host process.
 LatestGameState = LatestGameState or nil
 Game = Game or nil
-InAction = InAction or false
-
-Logs = Logs or {}
 
 colors = {
   red = "\27[31m",
@@ -12,11 +9,6 @@ colors = {
   reset = "\27[0m",
   gray = "\27[90m"
 }
-
-function addLog(msg, text) -- Function definition commented for performance, can be used for debugging
-  Logs[msg] = Logs[msg] or {}
-  table.insert(Logs[msg], text)
-end
 
 -- Checks if two points are within a given range.
 -- @param x1, y1: Coordinates of the first point.
@@ -49,7 +41,6 @@ function decideNextAction()
     local randomIndex = math.random(#directionMap)
     ao.send({Target = Game, Action = "PlayerMove", Direction = directionMap[randomIndex]})
   end
-  InAction = false
 end
 
 -- Handler to print game announcements and trigger game state updates.
@@ -59,12 +50,8 @@ Handlers.add(
   function (msg)
     if msg.Event == "Started-Waiting-Period" then
       ao.send({Target = ao.id, Action = "AutoPay"})
-    elseif (msg.Event == "Tick" or msg.Event == "Started-Game") and not InAction then
-      InAction = true
-      -- print("Getting game state...")
+    elseif (msg.Event == "Tick" or msg.Event == "Started-Game") then
       ao.send({Target = Game, Action = "GetGameState"})
-    elseif InAction then
-      print("Previous action still in progress. Skipping.")
     end
     print(colors.green .. msg.Event .. ": " .. msg.Data .. colors.reset)
   end
@@ -75,13 +62,8 @@ Handlers.add(
   "GetGameStateOnTick",
   Handlers.utils.hasMatchingTag("Action", "Tick"),
   function ()
-    if not InAction then
-      InAction = true
-      print(colors.gray .. "Getting game state..." .. colors.reset)
-      ao.send({Target = Game, Action = "GetGameState"})
-    else
-      print("Previous action still in progress. Skipping.")
-    end
+    print(colors.gray .. "Getting game state..." .. colors.reset)
+    ao.send({Target = Game, Action = "GetGameState"})
   end
 )
 
@@ -112,10 +94,6 @@ Handlers.add(
   "decideNextAction",
   Handlers.utils.hasMatchingTag("Action", "UpdatedGameState"),
   function ()
-    if LatestGameState.GameMode ~= "Playing" then 
-      InAction = false
-      return 
-    end
     print("Deciding next action.")
     decideNextAction()
     ao.send({Target = ao.id, Action = "Tick"})
@@ -127,24 +105,17 @@ Handlers.add(
   "ReturnAttack",
   Handlers.utils.hasMatchingTag("Action", "Hit"),
   function (msg)
-    if not InAction then
-      
-      InAction = true
-      local playerEnergy = LatestGameState.Players[ao.id].energy
-      if playerEnergy == undefined then
-        print(colors.red .. "Unable to read energy." .. colors.reset)
-        ao.send({Target = Game, Action = "Attack-Failed", Reason = "Unable to read energy."})
-      elseif playerEnergy == 0 then
-        print(colors.red .. "Player has insufficient energy." .. colors.reset)
-        ao.send({Target = Game, Action = "Attack-Failed", Reason = "Player has no energy."})
-      else
-        print(colors.red .. "Returning attack." .. colors.reset)
-        ao.send({Target = Game, Action = "PlayerAttack", AttackEnergy = tostring(playerEnergy)})
-      end
-      InAction = false
-      ao.send({Target = ao.id, Action = "Tick"})
+    local playerEnergy = LatestGameState.Players[ao.id].energy
+    if playerEnergy == undefined then
+      print(colors.red .. "Unable to read energy." .. colors.reset)
+      ao.send({Target = Game, Action = "Attack-Failed", Reason = "Unable to read energy."})
+    elseif playerEnergy == 0 then
+      print(colors.red .. "Player has insufficient energy." .. colors.reset)
+      ao.send({Target = Game, Action = "Attack-Failed", Reason = "Player has no energy."})
     else
-      print("Previous action still in progress. Skipping.")
+      print(colors.red .. "Returning attack." .. colors.reset)
+      ao.send({Target = Game, Action = "PlayerAttack", AttackEnergy = tostring(playerEnergy)})
     end
+    ao.send({Target = ao.id, Action = "Tick"})
   end
 )

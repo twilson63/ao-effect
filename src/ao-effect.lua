@@ -16,8 +16,8 @@ AverageMaxStrengthHitsToKill = 3 -- Average number of hits to eliminate a player
 -- @return Table representing player's initial state
 function playerInitState()
     return {
-        x = math.random(0, Width/8),
-        y = math.random(0, Height/8),
+        x = math.random(0, Width),
+        y = math.random(0, Height),
         health = 100,
         energy = 0
     }
@@ -73,7 +73,7 @@ end
 -- @param msg: Message request sent by player with attack info and player state
 function attack(msg)
     local player = msg.From
-    local attackEnergy = tonumber(msg.Tags.AttackEnergy)
+    local attackEnergy = math.abs(tonumber(msg.Tags.AttackEnergy))
 
     -- get player coordinates
     local x = Players[player].x
