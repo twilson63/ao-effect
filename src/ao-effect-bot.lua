@@ -1,7 +1,7 @@
 -- Initializing global variables to store the latest game state and game host process.
 LatestGameState = LatestGameState or nil
 Game = Game or nil
-
+CRED = "Sa0iBLPNyJQrwpTTG-tWLQU-1QeUAJA73DdxGGiKoJc"
 colors = {
   red = "\27[31m",
   green = "\27[32m",
@@ -73,7 +73,7 @@ Handlers.add(
   Handlers.utils.hasMatchingTag("Action", "AutoPay"),
   function (msg)
     print("Auto-paying confirmation fees.")
-    ao.send({ Target = Game, Action = "Transfer", Recipient = Game, Quantity = "1000"})
+    ao.send({ Target = CRED, Action = "Transfer", Recipient = Game, Quantity = "1000"})
   end
 )
 
