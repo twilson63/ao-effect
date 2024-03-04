@@ -67,6 +67,7 @@ function move(msg)
         ao.send({Target = playerToMove, Action = "Move-Failed", Reason = "Invalid direction."})
     end
     onTick()  -- Optional: Update energy each move
+    ao.send({Target = playerToMove, Action = "Tick"})
 end
 
 -- Handles player attacks
@@ -104,6 +105,7 @@ function attack(msg)
             end
         end
     end
+    ao.send({Target = player, Action = "Tick"})
 end
 
 -- Helper function to check if a target is within range
@@ -122,3 +124,8 @@ Handlers.add("PlayerMove", Handlers.utils.hasMatchingTag("Action", "PlayerMove")
 
 -- Handler for player attacks
 Handlers.add("PlayerAttack", Handlers.utils.hasMatchingTag("Action", "PlayerAttack"), attack)
+
+Handlers.prepend("RequestTokens", 
+    Handlers.utils.hasMatchingTag("Action", "RequestTokens"), 
+    Handlers.utils.reply("Sorry, this game does not give out tokens you must use $CRED")
+)
