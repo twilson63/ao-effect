@@ -1,6 +1,6 @@
 # AO Effect Variant - AO with random border
 
-A variant of the AO effect game - every new game generates barriers accross the map which you can not traverse.
+Introducing a variant of the AO Effect game featuring randomly generated barriers, challenging players to navigate around them to reach their targets.
 
 If you want to attack the enemy, you'll have to find your way around!
 
