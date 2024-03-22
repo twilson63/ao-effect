@@ -124,8 +124,3 @@ Handlers.add("PlayerMove", Handlers.utils.hasMatchingTag("Action", "PlayerMove")
 
 -- Handler for player attacks
 Handlers.add("PlayerAttack", Handlers.utils.hasMatchingTag("Action", "PlayerAttack"), attack)
-
-Handlers.prepend("RequestTokens", 
-    Handlers.utils.hasMatchingTag("Action", "RequestTokens"), 
-    Handlers.utils.reply("Sorry, this game does not give out tokens you must use $CRED")
-)
