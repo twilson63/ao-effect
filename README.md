@@ -34,7 +34,9 @@ aos arena --cron 15-seconds
 PaymentToken = ao.id
 ```
 
-Current Game: `0rVZYFxvfJpO__EfOz0_PUQ3GFE9kEaES0GkUDNXjvE`
+Past Game: `0rVZYFxvfJpO__EfOz0_PUQ3GFE9kEaES0GkUDNXjvE`
+
+Current Game: `tm1jYBC0F2gTZ0EuUQKq5q_esxITDFkAG6QEpLbpI9I`
 
 ## Create a bot
 
